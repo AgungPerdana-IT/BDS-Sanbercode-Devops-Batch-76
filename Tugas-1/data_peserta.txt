@@ -1,0 +1,7 @@
+Data Peserta Bootcamp Digital Skill DevOps
+1. Nama : Agung Perdana
+2. Email : perdana.agung.it@gmail.com
+3. Sistem Operasi yang digunakan:Ubuntu
+4. Akun Gitlab/Github: https://github.com/AgungPerdana-IT
+5. Akun Telegram: @AgungPerdanaIT
+6. Bahasa Pemrograman/Stack Yang dikuasai: PHP, Python & SQL
