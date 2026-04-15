@@ -1,0 +1,11 @@
+1. Saran dari AI (Chat GPT)
+    - Tambahkan set -euo pipefail untuk keamanan script
+    - Gunakan -r (readable check), bukan hanya -f
+    - Gunakan variabel (hindari hardcode)
+    - Tambahkan timestamp supaya file tidak tertimpa
+    - Simpan output ke log file (opsional tapi penting)
+
+2 Pendapat saya mengenai hasil review dari AI (Chat GPT) adalah saya sangat setuju, revisi dan masukan dari AI (Chat GPT)
+  sudah saya coba jalankan, dan hasilnya lebih rapi. Terutama pada poin "tambahkan timestamp supaya file tidak tertimpa"
+  sehingga file backup yang lama tidak hilang atau overwrite.
+  script yang saya buat sudah jalan dan berhasil, namun belum prodcution ready karena masih banyak celah
