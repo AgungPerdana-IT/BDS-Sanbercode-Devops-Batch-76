@@ -1,0 +1,5 @@
+Dari sisi performa, service database yang tetap berjalan meskipun tidak digunakan akan tetap memakan resource seperti RAM dan CPU. Hal ini merupakan pemborosan resource dan dapat mengganggu performa server, terutama pada VPS dengan spesifikasi kecil (misalnya 512 MB).
+
+Dari sisi keamanan, setiap service yang aktif akan membuka port tertentu. Port ini dapat diakses dari internet dan berpotensi menjadi target serangan, seperti brute force atau eksploitasi celah keamanan.
+
+Oleh karena itu, service yang tidak digunakan sebaiknya dihapus agar tidak membebani resource server dan tidak menjadi celah keamanan.
