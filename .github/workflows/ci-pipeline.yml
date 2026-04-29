@@ -19,6 +19,6 @@ jobs:
       - name: Tampilkan MY_SECRET_KEY (Masked)
         run: |
           echo "Nilai secret berhasil dibaca (masked oleh GitHub Actions):"
-          echo "${{ secrets.MY_SECRET_KEY }}"
+          echo "$MY_SECRET_KEY"
         env:
           MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
