@@ -1,0 +1,24 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Test-Pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kode
+        uses: actions/checkout@v4
+
+      - name: Jalankan Echo Sederhana
+        run: echo "Pipeline Berjalan!"
+
+      - name: Tampilkan MY_SECRET_KEY (Masked)
+        run: |
+          echo "Nilai secret berhasil dibaca (masked oleh GitHub Actions):"
+          echo "${{ secrets.MY_SECRET_KEY }}"
+        env:
+          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
