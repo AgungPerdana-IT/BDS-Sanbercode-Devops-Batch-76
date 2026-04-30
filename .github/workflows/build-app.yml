@@ -20,7 +20,7 @@ jobs:
           set -e
           echo 'Building app...'
           mkdir -p dist
-          echo "Hasil build otomatis Artifact" > dist/index.html
+          echo "<h1>Hasil Build</h1>" > dist/index.html
           echo "<p>Build time: $(date)</p>" >> dist/index.html
           echo "<p>Commit: $GITHUB_SHA</p>" >> dist/index.html
 
