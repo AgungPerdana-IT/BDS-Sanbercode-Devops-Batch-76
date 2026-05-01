@@ -1,15 +1,34 @@
- package main 
- import ( 
-  "fmt"
-  "net/http"
- ) 
+package main
 
-func handler(w http.ResponseWriter, r *http.Request) { 
-  fmt.Fprintf(w, "Hello from Golang Backend!") 
-} 
+import (
+	"log"
+	"net/http"
+	"os"
+)
 
-func main() { 
-  http.HandleFunc("/", handler) 
-  fmt.Println("Server running on port 8080") 
-  http.ListenAndServe(":8080", nil) 
-} 
+func handler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Hello from Golang Backend 🚀\n ini app terbaru coba auto deploy"))
+}
+
+func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handler)
+
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	log.Printf("Server running on port %s\n", port)
+
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("Server failed: %v", err)
+	}
+}
