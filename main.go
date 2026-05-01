@@ -8,7 +8,7 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Hello from Golang Backend 🚀\n ini app terbaru coba auto deploy ni"))
+	w.Write([]byte("Hello from Golang Backend 🚀\nini app terbaru coba auto deploy\n🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀"))
 }
 
 func main() {
