@@ -56,19 +56,19 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
-            mkdir -p $DEPLOY_PATH
+            mkdir -p ${{ env.DEPLOY_PATH }}
           "
 
           scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no app \
-            ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:$DEPLOY_PATH/app
+            ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:${{ env.DEPLOY_PATH }}/app
 
       - name: Restart app (PM2)
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
-            chmod +x $DEPLOY_PATH/app
-            pm2 describe $APP_NAME > /dev/null \
-              && pm2 restart $APP_NAME \
-              || pm2 start $DEPLOY_PATH/app --name $APP_NAME
+            chmod +x ${{ env.DEPLOY_PATH }}/app
+            pm2 describe ${{ env.APP_NAME }} > /dev/null \
+              && pm2 restart ${{ env.APP_NAME }} \
+              || pm2 start ${{ env.DEPLOY_PATH }}/app --name ${{ env.APP_NAME }}
             pm2 save
           "
 
