@@ -1,4 +1,4 @@
-name: test
+name: go-app-deploy
 
 on:
   push:
@@ -6,7 +6,18 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "CI jalan"
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - run: |
+          go mod tidy
+          go build -o app
+
+      - run: echo "Build sukses"
