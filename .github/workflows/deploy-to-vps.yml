@@ -15,9 +15,13 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
+          cache: false
 
-      - run: |
-          go mod tidy
-          go build -o app
+      - name: Tidy module
+        run: go mod tidy
 
-      - run: echo "Build sukses"
+      - name: Build app
+        run: go build -o app
+
+      - name: Done
+        run: echo "Build sukses ✅"
