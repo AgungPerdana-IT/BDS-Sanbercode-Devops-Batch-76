@@ -13,13 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    outputs:
-      artifact-name: go-build
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: '1.22'
           cache: false
@@ -50,30 +49,29 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload ke VPS
+      - name: Deploy to VPS
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
             mkdir -p $DEPLOY_PATH
           "
 
-          scp -i ~/.ssh/id_rsa app \
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no app \
             ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:$DEPLOY_PATH/app
 
-      - name: Set permission + restart PM2
+      - name: Restart app (PM2)
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
             chmod +x $DEPLOY_PATH/app
             pm2 describe $APP_NAME > /dev/null \
-            && pm2 restart $APP_NAME \
-            || pm2 start $DEPLOY_PATH/app --name $APP_NAME
+              && pm2 restart $APP_NAME \
+              || pm2 start $DEPLOY_PATH/app --name $APP_NAME
             pm2 save
           "
 
       - name: Cleanup SSH
         if: always()
-        run: rm -f ~/.ssh/id_rsa
-        
+        run: rm -f ~/.ssh/id_ed25519
