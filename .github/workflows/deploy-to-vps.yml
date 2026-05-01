@@ -86,8 +86,15 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
             set -e
 
+            # kill port biar ga ada zombie
+            fuser -k 8080/tcp || true
+
+            # hapus semua process lama
             pm2 delete ${{ env.APP_NAME }} || true
+
+            # start fresh
             pm2 start ${{ env.DEPLOY_PATH }}/app --name ${{ env.APP_NAME }}
+            
             pm2 save
           "
 
