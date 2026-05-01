@@ -8,6 +8,7 @@ on:
 env:
   APP_NAME: app
   DEPLOY_PATH: /var/www/app
+  TMP_PATH: /tmp/app_new
 
 jobs:
   build:
@@ -53,28 +54,46 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload binary to VPS (tmp)
+      # 🚀 Upload ke tmp (aman)
+      - name: Upload binary to VPS
         run: |
           scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no app \
-          ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/tmp/app
+          ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:${{ env.TMP_PATH }}
 
-      - name: Move & set permission (sudo)
+      # 🔄 Deploy (atomic + backup)
+      - name: Deploy & backup old version
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
+            set -e
+
             sudo mkdir -p ${{ env.DEPLOY_PATH }}
-            sudo mv /tmp/app ${{ env.DEPLOY_PATH }}/app
+
+            # backup binary lama (kalau ada)
+            if [ -f ${{ env.DEPLOY_PATH }}/app ]; then
+              sudo mv ${{ env.DEPLOY_PATH }}/app ${{ env.DEPLOY_PATH }}/app_backup_\$(date +%s)
+            fi
+
+            # pindahkan binary baru
+            sudo mv ${{ env.TMP_PATH }} ${{ env.DEPLOY_PATH }}/app
+
+            # set permission
             sudo chmod +x ${{ env.DEPLOY_PATH }}/app
           "
 
+      # 🔁 Restart app
       - name: Restart app (PM2)
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
+            set -e
+
             pm2 describe ${{ env.APP_NAME }} > /dev/null \
               && pm2 restart ${{ env.APP_NAME }} \
               || pm2 start ${{ env.DEPLOY_PATH }}/app --name ${{ env.APP_NAME }}
+
             pm2 save
           "
 
+      # 🧹 Cleanup key
       - name: Cleanup SSH
         if: always()
         run: rm -f ~/.ssh/id_ed25519
