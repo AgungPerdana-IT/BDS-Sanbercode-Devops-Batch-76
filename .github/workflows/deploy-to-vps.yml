@@ -54,13 +54,13 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      # 🚀 Upload ke tmp (aman)
+      # 🚀 Upload binary ke VPS (tmp dulu)
       - name: Upload binary to VPS
         run: |
           scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no app \
           ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:${{ env.TMP_PATH }}
 
-      # 🔄 Deploy (atomic + backup)
+      # 🔄 Deploy + backup versi lama
       - name: Deploy & backup old version
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
@@ -80,20 +80,29 @@ jobs:
             sudo chmod +x ${{ env.DEPLOY_PATH }}/app
           "
 
-      # 🔁 Restart app
-      - name: Restart app (PM2)
+      # 🔁 Restart app (FORCE reload biar pasti pakai binary baru)
+      - name: Restart app (PM2 - force)
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
             set -e
 
-            pm2 describe ${{ env.APP_NAME }} > /dev/null \
-              && pm2 restart ${{ env.APP_NAME }} \
-              || pm2 start ${{ env.DEPLOY_PATH }}/app --name ${{ env.APP_NAME }}
-
+            pm2 delete ${{ env.APP_NAME }} || true
+            pm2 start ${{ env.DEPLOY_PATH }}/app --name ${{ env.APP_NAME }}
             pm2 save
           "
 
-      # 🧹 Cleanup key
+      # 🔍 Verifikasi deploy (biar yakin update)
+      - name: Verify app
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
+            echo '=== FILE INFO ==='
+            ls -l ${{ env.DEPLOY_PATH }}/app
+
+            echo '=== RESPONSE ==='
+            curl -s localhost:8080
+          "
+
+      # 🧹 Cleanup SSH key
       - name: Cleanup SSH
         if: always()
         run: rm -f ~/.ssh/id_ed25519
