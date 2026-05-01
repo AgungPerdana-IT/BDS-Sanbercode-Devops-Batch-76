@@ -1,24 +1,45 @@
-name: test-secret-key
+name: build-artifact
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  Test-Pipeline:
+  build-app:
+    name: Build App Job
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Kode
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Jalankan Echo Sederhana
-        run: echo "Pipeline Berjalan!"
-
-      - name: Tampilkan MY_SECRET_KEY (Masked)
+      - name: Create dist folder and index.html
         run: |
-          echo "Nilai secret berhasil dibaca (masked oleh GitHub Actions):"
-          echo "$MY_SECRET_KEY"
-        env:
-          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+          set -e
+          echo 'Building app...'
+          mkdir -p dist
+          echo "<h1>Hasil Build</h1>" > dist/index.html
+          echo "<p>Build time: $(date)</p>" >> dist/index.html
+          echo "<p>Commit: $GITHUB_SHA</p>" >> dist/index.html
+
+      - name: Simulate Test
+        run: |
+          echo "Running tests..."
+          sleep 2
+          echo "All tests passed ✅"
+
+      - name: Verify hasil build
+        run: |
+          echo "=== Isi folder dist ==="
+          ls -la dist/
+          echo "=== Isi index.html ==="
+          cat dist/index.html
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hasil-build-web
+          path: dist/
+          retention-days: 7
